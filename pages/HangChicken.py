@@ -93,21 +93,23 @@ def show():
     st.text("guessed: "+" ".join(st.session_state.guessed))
 
 def process(c):
-    if c < 'a' or c > 'z':
-        st.error("Must be a lowercase letter!")
+    if (c < 'a' or c > 'z'):
+        st.session_state.message_box.error("Must be a lowercase letter!")
     elif c in st.session_state.guessed:
-        st.warning("You already guessed that one!")
+        st.session_state.message_box.warning("You already guessed that one!")
     else:
         st.session_state.guessed.append(c)
         if c not in st.session_state.word:
             st.session_state.step += 1
             if st.session_state.step == len(STEPS) - 1:
-                st.error("YOU LOSE, the word was "+st.session_state.word)
+                st.session_state.message_box.error("YOU LOSE, the word was "+st.session_state.word)
                 st.session_state.can_play = False
         elif all(c in st.session_state.guessed for c in st.session_state.word):
-            st.success("YOU WIN!!")
+            st.session_state.message_box.success("YOU WIN!!")
             st.balloons()
     show()
+
+st.set_page_config(layout="wide", page_title="Hang Chicken", page_icon="🐔")
 
 if "can_play" not in st.session_state:
     st.session_state.can_play = True
@@ -120,7 +122,11 @@ if "word" not in st.session_state:
 
 st.title("Hang Chicken")
 
-c1, c2, c3 = st.columns([1,2,3])
+c1, c2, c3 = st.columns([1, 2, 3])
+if "message_box" not in st.session_state:
+    c3.markdown("")
+    st.session_state.message_box = c3.empty()
+
 c1.markdown("")
 c1.markdown("")
 if c1.button("New Game"):

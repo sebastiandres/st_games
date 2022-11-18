@@ -26,24 +26,28 @@ def heatmap(matrix, xticks, yticks):
 
 st.title("Rock Paper Scissors")
 
-RPS_options = ("Rock", "Paper", "Scissors", "Random")
+RPS_options = ("Rock", "Paper", "Scissors")
 
 if "results" not in st.session_state:
     st.session_state.results = np.zeros([3,3], dtype=int)
 
 tab1, tab2 = st.tabs(["Game", "Help"])
 
+if "initial_choice" not in st.session_state:
+    st.session_state.initial_choice = 0
+
 with tab1:
-    st.subheader("Game")
-    col11, col21 = st.columns([5,1])
-    col21 = col21.empty()
-    human_selection = col11.radio("Choose one of the following", RPS_options, horizontal=True)
+    col11, col21, col31 = st.columns([5,1,1])
+    if col21.button("Random"):
+        st.session_state.initial_choice = random.randint(0,2)
+    col31 = col31.empty()
+    human_selection = col11.radio("Choose one of the following", RPS_options, horizontal=True, index=st.session_state.initial_choice)
     # Put some images
     col12, col22, col32 = st.columns([3,3,4])
     image_ph = col12.empty()
     image_ph.image(f"images/{human_selection}.png", width=200)
     col12.caption("Your choice")
-    if col21.button("Play"):
+    if col31.button("Play"):
         computer_selection = random.choice(RPS_options[:3])
         if human_selection == "Random":
             human_selection = random.choice(RPS_options[:3])
@@ -62,7 +66,6 @@ with tab1:
         col32.image(f"images/{computer_selection}.png", width=200)
         col32.caption("Computer's choice")
     # Put some stats, and keep them all the time
-    st.subheader("Stats")
     col13, col23, col33, col43 = st.columns([1,1,1,2])
     col13.metric("Wins", st.session_state.results[0,2] + st.session_state.results[1,0] + st.session_state.results[2,1])
     col23.metric("Ties", st.session_state.results[0,0] + st.session_state.results[1,1] + st.session_state.results[2,2])
